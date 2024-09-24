@@ -1,0 +1,14 @@
+[package]
+name = "adafruit-motor-shield-v2-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+embedded-hal = "1.0.0"
+ufmt = "0.2.0"
+libm = "0.2.8"
+
+[dependencies.arduino-hal]
+git = "https://github.com/rahix/avr-hal"
+rev = "3e362624547462928a219c40f9ea8e3a64f21e5f"
+features = ["arduino-uno"]
