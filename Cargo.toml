@@ -1,5 +1,5 @@
 [package]
-name = "adafruit-motor-shield-v2-rs"
+name = "adafruit-motor-shield-v2"
 version = "0.1.0"
 edition = "2021"
 

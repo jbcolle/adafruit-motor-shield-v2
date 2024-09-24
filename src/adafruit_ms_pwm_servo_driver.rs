@@ -1,7 +1,5 @@
-use arduino_hal::{delay_ms, I2c, Peripherals, Pins};
-use arduino_hal::i2c::Error;
-use arduino_hal::pac::TWI;
-use arduino_hal::prelude::_embedded_hal_blocking_i2c_Write;
+use libm::floorf;
+use arduino_hal::delay_ms;
 
 const PCA9685_SUBADR1: u8 =  0x2;
 const PCA9685_SUBADR2: u8 =  0x3;
@@ -34,26 +32,23 @@ where
     }
 
     pub fn set_pwm(&mut self, channel: u8, on: u16, off: u16) -> Result<(), E> {
+        let base_reg = LED0_ON_L + (4 * channel);
         let on_l = (on & 0xFF) as u8;
         let on_h = (on >> 8) as u8;
         let off_l = (off & 0xFF) as u8;
         let off_h = (off >> 8) as u8;
 
-        let base_reg = LED0_ON_L + (4 * channel);
-        // (66 0 0 208 7 )
-        // (42 0 0 D0 7 )
         self.i2c.write(self.addr, &[base_reg, on_l, on_h, off_l, off_h])
     }
 
     pub fn set_pwm_freq(&mut self, freq: f32) -> Result<(), E>{
-        let mut freq = freq * 0.9;
+        let freq = freq * 0.9;
         let mut prescaleval = 25000000.0;
         prescaleval /= 4096.0;
         prescaleval /= freq;
         prescaleval -= 1.0;
 
-        let prescale = libm::floorf(prescaleval + 0.5) as u8;
-        // w.write_str("Final pre-scale: ")?; w.write_char(char::from(prescale))?;
+        let prescale = floorf(prescaleval + 0.5) as u8;
 
         let oldmode = self.read8(PCA9685_MODE1)?;
         let new_mode = (oldmode & 0x7F) | 0x10;
@@ -63,9 +58,6 @@ where
         self.write8(PCA9685_MODE1, oldmode)?;
         delay_ms(5);
         self.write8(PCA9685_MODE1, oldmode | 0xa1)?;
-
-        // w.write_str("\nMode now: ")?;
-        // w.write_char(char::from(self.read8(PCA9685_MODE1)?))?;
 
         Ok(())
     }
@@ -80,21 +72,5 @@ where
         let buf = [addr, data];
         self.i2c.write(self.addr, &buf)
     }
-
-    // pub fn set_pwm(&mut self, num: u8, on: u16, off: u16) -> Result<(), Error> {
-    //
-    //     let LED0_ON_L =  0x6;
-    //
-    //     let mut buffer = [0u8;5];
-    //
-    //     buffer[0] = LED0_ON_L + (4 * num);
-    //     buffer[1] = on as u8;
-    //     buffer[2] = (on >> 8) as u8;
-    //     buffer[3] = off as u8;
-    //     buffer[4] = (off >> 8) as u8;
-    //
-    //     self.i2c.write(ADDR, &buffer)
-    //
-    // }
 }
 
