@@ -1,3 +1,4 @@
+#![allow(unused)]
 use arduino_hal::delay_ms;
 use libm::floorf;
 

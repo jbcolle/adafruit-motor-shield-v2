@@ -5,7 +5,6 @@ use embedded_hal::i2c::I2c;
 
 pub mod adafruit_ms_pwm_servo_driver;
 
-const DEFAULT_ADDR: u8 = 0x60;
 const DEFAULT_FREQ: u16 = 1600;
 const NUM_PINS: u8 = 16;
 
@@ -15,8 +14,8 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 pub struct AdafruitMotorShieldV2<I2C> {
-    addr: u8,
-    freq: u16,
+    _addr: u8,
+    _freq: u16,
     pwm: AdafruitMSPWMServoDriver<I2C>,
 }
 
@@ -27,8 +26,8 @@ where
     pub fn new(addr: u8, i2c: I2C) -> Self {
         let pwm = AdafruitMSPWMServoDriver::new(addr, i2c);
         Self {
-            addr,
-            freq: DEFAULT_FREQ,
+            _addr: addr,
+            _freq: DEFAULT_FREQ,
             pwm,
         }
     }
