@@ -17,64 +17,44 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 pub struct AdafruitMotorShieldV2<I2C> {
     addr: u8,
     freq: u16,
-    pwm: Option<AdafruitMSPWMServoDriver<I2C>>,
-}
-
-impl<I2C> Default for AdafruitMotorShieldV2<I2C> {
-    fn default() -> Self {
-        Self {
-            addr: DEFAULT_ADDR,
-            freq: DEFAULT_FREQ,
-            pwm: None,
-        }
-    }
+    pwm: AdafruitMSPWMServoDriver<I2C>,
 }
 
 impl<I2C, E> AdafruitMotorShieldV2<I2C>
 where
     I2C: I2c<Error=E>,
 {
-    pub fn new(addr: u8) -> Self {
+    pub fn new(addr: u8, i2c: I2C) -> Self {
+        let pwm = AdafruitMSPWMServoDriver::new(addr, i2c);
         Self {
             addr,
             freq: DEFAULT_FREQ,
-            pwm: None,
+            pwm,
         }
     }
 
-    pub fn begin(&mut self, freq: u16, i2c: I2C) -> Result<(), E> {
-        self.pwm = Some(AdafruitMSPWMServoDriver::new(i2c, self.addr));
-        let pwm = self.pwm.as_mut().unwrap();
-
-        pwm.set_pwm_freq(freq as f32)?;
+    pub fn begin(&mut self, freq: u16) -> Result<(), E> {
+        self.pwm.set_pwm_freq(freq as f32)?;
 
         for pin in 0..NUM_PINS {
-            pwm.set_pwm(pin, 0, 0)?;
+            self.pwm.set_pwm(pin, 0, 0)?;
         }
 
         Ok(())
     }
 
     pub fn set_pwm(&mut self, pin: u8, value: u16) -> Result<(), E> {
-        let pwm = self
-            .pwm
-            .as_mut()
-            .expect("Could not get PWM driver. Have you called begin()?");
         match value > 4095 {
-            true => pwm.set_pwm(pin, 4096, 0)?,
-            false => pwm.set_pwm(pin, 0, value)?,
+            true => self.pwm.set_pwm(pin, 4096, 0)?,
+            false => self.pwm.set_pwm(pin, 0, value)?,
         }
         Ok(())
     }
 
     pub fn set_pin(&mut self, pin: u8, value: bool) -> Result<(), E> {
-        let pwm = self
-            .pwm
-            .as_mut()
-            .expect("Could not get PWM driver. Have you called begin()?");
         match value {
-            true => pwm.set_pwm(pin, 4096, 0)?,
-            false => pwm.set_pwm(pin, 0, 0)?,
+            true => self.pwm.set_pwm(pin, 4096, 0)?,
+            false => self.pwm.set_pwm(pin, 0, 0)?,
         }
         Ok(())
     }
