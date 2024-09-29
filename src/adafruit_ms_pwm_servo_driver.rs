@@ -1,9 +1,9 @@
-use libm::floorf;
 use arduino_hal::delay_ms;
+use libm::floorf;
 
-const PCA9685_SUBADR1: u8 =  0x2;
-const PCA9685_SUBADR2: u8 =  0x3;
-const PCA9685_SUBADR3: u8 =  0x4;
+const PCA9685_SUBADR1: u8 = 0x2;
+const PCA9685_SUBADR2: u8 = 0x3;
+const PCA9685_SUBADR3: u8 = 0x4;
 
 const PCA9685_MODE1: u8 = 0x00;
 const PCA9685_PRESCALE: u8 = 0xFE;
@@ -25,9 +25,9 @@ pub struct AdafruitMSPWMServoDriver<I2C> {
 
 impl<I2C, E> AdafruitMSPWMServoDriver<I2C>
 where
-    I2C: embedded_hal::i2c::I2c<Error = E>
+    I2C: embedded_hal::i2c::I2c<Error=E>,
 {
-    pub fn new(i2c: I2C, addr: u8) -> Self {
+    pub fn new(addr: u8, i2c: I2C) -> Self {
         Self { i2c, addr }
     }
 
@@ -38,10 +38,11 @@ where
         let off_l = (off & 0xFF) as u8;
         let off_h = (off >> 8) as u8;
 
-        self.i2c.write(self.addr, &[base_reg, on_l, on_h, off_l, off_h])
+        self.i2c
+            .write(self.addr, &[base_reg, on_l, on_h, off_l, off_h])
     }
 
-    pub fn set_pwm_freq(&mut self, freq: f32) -> Result<(), E>{
+    pub fn set_pwm_freq(&mut self, freq: f32) -> Result<(), E> {
         let freq = freq * 0.9;
         let mut prescaleval = 25000000.0;
         prescaleval /= 4096.0;
@@ -73,4 +74,3 @@ where
         self.i2c.write(self.addr, &buf)
     }
 }
-
