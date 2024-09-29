@@ -1,3 +1,27 @@
+//! A port of the
+//! [Adafruit Motor Shield V2 Library](https://github.com/adafruit/Adafruit_Motor_Shield_V2_Library).
+//! The main and begin functions have been blended into one another a bit as for now there
+//! seems to be no reason to keep them really separate. The rest of the library
+//! has been translated verbatim as best as possible.
+//!
+//! Might separate the PWM library later, but I don't have the hardware at hand (yet).
+//!
+//! Original doc:
+//!
+//! "This is the library for the Adafruit Motor Shield V2 for Arduino.
+//!  It supports DC motors & Stepper motors with microstepping as well
+//!  as stacking-support. It is *not* compatible with the V1 library!
+//!
+//!  It will only work with <https://www.adafruit.com/products/1483>
+//!
+//!  Adafruit invests time and resources providing this open
+//!  source code, please support Adafruit and open-source hardware
+//!  by purchasing products from Adafruit!
+//!
+//!  Written by Limor Fried/Ladyada for Adafruit Industries.
+//!  BSD license, check license.txt for more information.
+//!  All text above must be included in any redistribution."
+
 #![no_std]
 
 use crate::adafruit_ms_pwm_servo_driver::AdafruitMSPWMServoDriver;
