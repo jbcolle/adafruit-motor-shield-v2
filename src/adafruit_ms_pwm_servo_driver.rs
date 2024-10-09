@@ -19,7 +19,8 @@
 //!   BSD license, all text above must be included in any redistribution"
 
 #![allow(unused)]
-use arduino_hal::delay_ms;
+
+use embedded_hal::delay::DelayNs;
 use libm::floorf;
 
 const PCA9685_SUBADR1: u8 = 0x2;
@@ -63,7 +64,10 @@ where
             .write(self.addr, &[base_reg, on_l, on_h, off_l, off_h])
     }
 
-    pub fn set_pwm_freq(&mut self, freq: f32) -> Result<(), E> {
+    pub fn set_pwm_freq<D>(&mut self, freq: f32, delay: &mut D) -> Result<(), E>
+    where
+        D: DelayNs
+    {
         let freq = freq * 0.9;
         let mut prescaleval = 25000000.0;
         prescaleval /= 4096.0;
@@ -78,7 +82,7 @@ where
         self.write8(PCA9685_MODE1, new_mode)?;
         self.write8(PCA9685_PRESCALE, prescale)?;
         self.write8(PCA9685_MODE1, oldmode)?;
-        delay_ms(5);
+        delay.delay_ms(5);
         self.write8(PCA9685_MODE1, oldmode | 0xa1)?;
 
         Ok(())

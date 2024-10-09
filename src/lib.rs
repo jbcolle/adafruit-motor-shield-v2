@@ -56,8 +56,11 @@ where
         }
     }
 
-    pub fn begin(&mut self, freq: u16) -> Result<(), E> {
-        self.pwm.set_pwm_freq(freq as f32)?;
+    pub fn begin<D>(&mut self, freq: u16, delay: &mut D) -> Result<(), E> 
+    where 
+        D: embedded_hal::delay::DelayNs
+    {
+        self.pwm.set_pwm_freq(freq as f32, delay)?;
 
         for pin in 0..NUM_PINS {
             self.pwm.set_pwm(pin, 0, 0)?;
